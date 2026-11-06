@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment
+.env
+.env.local
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# SmartRAG runtime data
+data/
+vector_db/
+logs/
+*.log

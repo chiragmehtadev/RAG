@@ -1,0 +1,72 @@
+# SmartRAG: Ollama + FastAPI backend + Next.js frontend
+#
+#   cd docker && docker compose up -d --build
+#   open http://localhost:3000
+#
+# Already running Ollama on the host? Start only the app services and point the backend at it:
+#   SMARTRAG_OLLAMA_HOST=http://host.docker.internal:11434 docker compose up -d --build backend frontend
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # Uncomment to use an NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # One-shot job that pulls the models on first start (cached in the ollama_models volume)
+  ollama-pull:
+    image: ollama/ollama:latest
+    environment:
+      OLLAMA_HOST: ollama:11434
+    entrypoint: ["sh", "-c", "ollama pull llama3.1:8b && ollama pull nomic-embed-text"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      SMARTRAG_MODELS__OLLAMA_HOST: ${SMARTRAG_OLLAMA_HOST:-http://ollama:11434}
+      SMARTRAG_API__CORS_ORIGINS: '["http://localhost:3000"]'
+    volumes:
+      - smartrag_data:/app/data
+      - smartrag_vectors:/app/vector_db
+      - hf_cache:/home/smartrag/.cache
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  ollama_models:
+  smartrag_data:
+  smartrag_vectors:
+  hf_cache:

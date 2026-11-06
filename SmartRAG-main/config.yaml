@@ -1,0 +1,41 @@
+# SmartRAG configuration
+# Any value can be overridden with an environment variable:
+#   SMARTRAG_<SECTION>__<KEY>, e.g. SMARTRAG_MODELS__LLM_MODEL=llama3.2:3b
+
+log_level: INFO
+
+models:
+  llm_model: "llama3.1:8b"            # any chat model pulled in Ollama
+  embedding_model: "nomic-embed-text" # changing this requires re-ingesting documents
+  ollama_host: "http://localhost:11434"
+  vision_model: "Salesforce/blip-image-captioning-base" # Hugging Face image captioning model
+  whisper_model: "base"               # tiny | base | small | medium | large
+
+vector_store:
+  persist_directory: "./vector_db"
+  collection_name: "multimodal_documents"
+
+processing:
+  chunk_size: 1000       # characters
+  chunk_overlap: 200
+  max_image_size: [1024, 1024]
+  ocr_enabled: true      # requires Tesseract
+  max_audio_duration: 300 # seconds
+
+retrieval:
+  top_k: 5
+  similarity_threshold: 0.45 # cosine similarity floor; the model decides which excerpts are relevant
+
+generation:
+  temperature: 0.7
+  top_p: 0.9
+  max_tokens: 1024
+  context_window: 8192
+  history_messages: 6    # prior chat turns sent to the model
+
+storage:
+  data_directory: "./data" # uploaded files and document registry
+
+api:
+  max_upload_size_mb: 50
+  cors_origins: ["http://localhost:3000"]

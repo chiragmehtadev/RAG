@@ -1,0 +1,27 @@
+# API
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+
+# Configuration
+pydantic>=2.6.0
+pydantic-settings>=2.3.0
+pyyaml>=6.0.0
+
+# LLM, embeddings and vector store
+ollama>=0.4.0
+chromadb>=0.5.0
+
+# Documents
+pdfplumber>=0.10.0
+python-docx>=1.1.0
+
+# Images (OCR needs the Tesseract binary installed separately)
+Pillow>=10.0.0
+pytesseract>=0.3.10
+transformers>=4.40.0
+torch>=2.2.0
+torchvision>=0.17.0
+
+# Audio (needs ffmpeg installed separately)
+openai-whisper>=20231117
